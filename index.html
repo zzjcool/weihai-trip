@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>杭州⇄威海 国庆自驾行程书 v3.0</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    /* 海岸线黄昏色板 */
+    --deep:#0c3a44;        /* 深海墨 · 标题/强调 */
+    --sea:#17798b;         /* 主青 */
+    --sea-soft:#e3f0f2;    /* 海雾浅青 */
+    --sea-line:#bcdce2;
+    --coral:#e9734f;       /* 珊瑚橙 · P0/关键 */
+    --coral-deep:#c74e2b;
+    --coral-soft:#fdede6;
+    --gold:#e6a23c;        /* 日落金 · 警示/待办 */
+    --gold-deep:#9a6712;
+    --gold-soft:#fbf3e2;
+    --ink:#25353b;
+    --sub:#68797f;
+    --bg:#f6f2ea;          /* 沙滩页底 */
+    --card:#fffdf9;
+    --line:#e9e1d2;
+    --radius:18px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px 16px 60px}
+
+  /* ===== HERO · 黄昏海岸 ===== */
+  .hero{
+    background:
+      radial-gradient(ellipse 60% 55% at 88% 108%, rgba(233,115,79,.55), rgba(233,115,79,0) 65%),
+      radial-gradient(ellipse 45% 40% at 70% 115%, rgba(230,162,60,.35), rgba(230,162,60,0) 70%),
+      linear-gradient(155deg,#082b33 0%,#0e4a58 42%,#17798b 78%,#1e8a99 100%);
+    color:#fff;border-radius:22px;padding:38px 32px 56px;margin-bottom:24px;position:relative;overflow:hidden;
+    box-shadow:0 12px 32px -12px rgba(12,58,68,.45);
+  }
+  .hero::after{content:"";position:absolute;right:-70px;top:-70px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(255,217,168,.22),rgba(255,217,168,0) 70%)}
+  .hero .waves{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:64px;display:block}
+  .hero h1{
+    font-size:30px;letter-spacing:1px;position:relative;z-index:1;
+    background:linear-gradient(92deg,#ffffff 35%,#ffd9a8 85%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+  }
+  .hero .sub{margin-top:12px;font-size:14px;display:flex;flex-wrap:wrap;gap:8px;position:relative;z-index:1}
+  .hero .tag{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);padding:3px 12px;border-radius:99px;font-size:12.5px;backdrop-filter:blur(3px)}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:24px;position:relative;z-index:1}
+  .kpi{background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:12px 14px;backdrop-filter:blur(4px)}
+  .kpi .v{font-size:24px;font-weight:700;color:#fff;text-shadow:0 1px 8px rgba(8,43,51,.4)}
+  .kpi .l{font-size:12px;opacity:.85;margin-top:2px}
+  .kpi .v em{font-style:normal;font-size:13px;font-weight:400}
+
+  /* ===== sections ===== */
+  section{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px;margin-bottom:22px;box-shadow:0 2px 10px -4px rgba(37,53,59,.08)}
+  h2{font-size:20px;margin-bottom:16px;display:flex;align-items:center;gap:10px;color:var(--deep);flex-wrap:wrap}
+  h2 .n{background:linear-gradient(135deg,var(--sea),var(--coral));color:#fff;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;box-shadow:0 3px 8px -2px rgba(23,121,139,.5)}
+  h3{font-size:15.5px;margin:14px 0 8px;color:var(--deep)}
+
+  /* ===== 1 路线总览 · 垂直动线 ===== */
+  .route-flow{margin:10px 0 4px}
+  .rf{display:grid;grid-template-columns:44px 1fr;gap:14px;position:relative;padding-bottom:18px}
+  .rf:last-child{padding-bottom:2px}
+  .rf::before{content:"";position:absolute;left:21px;top:44px;bottom:0;width:2px;border-radius:2px;
+    background:linear-gradient(180deg,var(--sea-line),rgba(233,115,79,.45))}
+  .rf:last-child::before{display:none}
+  .rf-node{width:44px;height:44px;border-radius:50%;background:var(--card);border:2px solid var(--sea);
+    color:var(--sea);font-weight:800;font-size:13.5px;display:flex;align-items:center;justify-content:center;
+    position:relative;z-index:1;box-shadow:0 2px 6px -1px rgba(23,121,139,.3)}
+  .rf.warn .rf-node{border-color:var(--coral);color:var(--coral-deep);background:var(--coral-soft);box-shadow:0 2px 8px -1px rgba(233,115,79,.45)}
+  .rf-date{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;font-weight:600;color:var(--sub);margin:2px 0 7px}
+  .rf-body{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:13.5px}
+  .rf .leg{background:var(--sea-soft);color:var(--deep);border-radius:8px;padding:2px 10px;font-size:12px;white-space:nowrap}
+  .rf .arr{color:#9db4ba;font-size:12px}
+  .rf .stop{background:var(--card);border:1.5px solid #d8d0bf;border-radius:8px;padding:2px 10px;font-size:12.5px}
+  .rf .stop.p0{border-color:var(--coral);color:var(--coral-deep);font-weight:600;background:var(--coral-soft)}
+  .rf .bed{margin-left:auto;font-size:11.5px;color:#fff;border-radius:99px;padding:2px 10px;white-space:nowrap;font-weight:600}
+  .bed.hotel{background:var(--sea)}.bed.car{background:#c98a2d}.bed.home{background:var(--coral)}
+
+  /* ===== 2 图表 ===== */
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+  .chart-box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 2px 8px -4px rgba(37,53,59,.06)}
+  .chart-box h4{font-size:13.5px;color:var(--deep);margin-bottom:12px;font-weight:600}
+  .cwrap{position:relative;height:250px}
+  .cwrap.tall{height:270px}
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tbl-wrap table{min-width:520px}
+
+  /* ===== 优先级表格 ===== */
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:#f4eee2;text-align:left;padding:8px 10px;border-bottom:2px solid var(--line);font-size:12.5px;color:var(--deep)}
+  td{padding:8px 10px;border-bottom:1px solid #f2ecdf;vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  .p0{color:var(--coral-deep);font-weight:600}.p1{color:var(--gold-deep);font-weight:500}.p2{color:var(--sub)}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+  .dot.r{background:var(--coral)}.dot.y{background:var(--gold)}.dot.g{background:#94a3a8}
+
+  /* ===== 关键时刻时间线 ===== */
+  .tl{position:relative;padding-left:22px}
+  .tl::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:2px;border-radius:2px;background:linear-gradient(var(--sea),var(--coral))}
+  .tl-item{position:relative;margin-bottom:14px}
+  .tl-item::before{content:"";position:absolute;left:-21px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--card);border:3px solid var(--sea)}
+  .tl-item.warn::before{border-color:var(--coral)}
+  .tl-item .t{font-weight:700;font-size:13.5px;color:var(--sea)}
+  .tl-item.warn .t{color:var(--coral-deep)}
+  .tl-item .c{font-size:13px;color:var(--ink)}
+  .tl-item .c b{color:var(--coral-deep)}
+
+  /* ===== 3 逐日卡片 ===== */
+  .day{border:1px solid var(--line);border-radius:16px;margin-bottom:14px;overflow:hidden;background:#fff;box-shadow:0 2px 8px -4px rgba(37,53,59,.06)}
+  .day-h{background:linear-gradient(90deg,var(--sea-soft),rgba(227,240,242,0) 70%);padding:11px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line);position:relative}
+  .day-h::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--sea)}
+  .day.sun .day-h{background:linear-gradient(90deg,var(--coral-soft),rgba(253,237,230,0) 70%)}
+  .day.sun .day-h::before{background:linear-gradient(180deg,var(--coral),var(--gold))}
+  .day-h .num{background:var(--sea);color:#fff;border-radius:8px;padding:2px 10px;font-size:12.5px;font-weight:700;box-shadow:0 2px 6px -1px rgba(23,121,139,.45)}
+  .day.sun .day-h .num{background:linear-gradient(135deg,var(--coral),var(--gold));box-shadow:0 2px 6px -1px rgba(233,115,79,.45)}
+  .day-h .title{font-weight:700;font-size:15px;color:var(--deep)}
+  .day-h .meta{margin-left:auto;font-size:12px;color:var(--sub)}
+  .day-h .meta b{color:var(--sea)}
+  .day.sun .day-h .meta b{color:var(--coral-deep)}
+  .day-b{padding:12px 16px;font-size:13.5px}
+  .day-b ul{list-style:none}
+  .day-b li{padding:4px 0;display:flex;gap:8px}
+  .day-b li .tm{color:var(--sea);font-weight:700;min-width:86px;font-variant-numeric:tabular-nums}
+  .day.sun .day-b li .tm{color:var(--coral-deep)}
+  .badge{display:inline-block;border-radius:99px;padding:1px 9px;font-size:10.5px;font-weight:700;letter-spacing:.6px;margin-right:4px;vertical-align:1px;border:1px solid transparent}
+  .b-p0{background:var(--coral-soft);color:var(--coral-deep);border-color:#f2bda9}
+  .b-p1{background:var(--gold-soft);color:var(--gold-deep);border-color:#eacb91}
+  .b-p2{background:#eef1f1;color:#67787e;border-color:#dbe2e2}
+  .b-fix{background:var(--coral-soft);color:var(--coral-deep);border:1px solid #f0b09c}
+  .b-eat{background:#e5f3ec;color:#1c7a4d;border-color:#bde0cd}
+  .b-stay{background:var(--sea-soft);color:var(--deep);border-color:var(--sea-line)}
+  .note{background:var(--gold-soft);border-left:3px solid var(--gold);padding:8px 12px;border-radius:0 10px 10px 0;font-size:12.5px;margin-top:8px;color:#7c5410}
+  .note b{color:#8a4a0b}
+
+  /* ===== 5 住宿 ===== */
+  .stay-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .stay{border:1px solid var(--line);border-radius:14px;padding:14px;font-size:13px;position:relative;background:#fff}
+  .stay .n{font-weight:700;color:var(--deep)}
+  .stay .st{position:absolute;top:12px;right:12px;font-size:11px;border-radius:99px;padding:1px 9px;font-weight:600}
+  .ok{background:var(--sea-soft);color:var(--deep)}.todo{background:var(--gold-soft);color:var(--gold-deep)}
+  .stay .info{color:var(--sub);font-size:12px;margin-top:4px}
+
+  /* ===== 清单 ===== */
+  .check{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:6px 26px;font-size:13.5px}
+  .check li{list-style:none;padding:5px 0;border-bottom:1px dashed var(--line)}
+  .check li::before{content:"☐";color:var(--sea);font-size:16px;margin-right:8px}
+
+  footer{text-align:center;color:var(--sub);font-size:12px;margin-top:10px}
+
+  @media(max-width:640px){
+    body{font-size:15px}
+    .wrap{padding:14px 10px 40px}
+    .hero{padding:24px 18px 48px;border-radius:18px}.hero h1{font-size:21px}
+    .hero .waves{height:44px}
+    section{padding:16px 14px;border-radius:16px}
+    h2{font-size:17px}
+    .rf{grid-template-columns:38px 1fr;gap:10px;padding-bottom:16px}
+    .rf::before{left:18px;top:38px}
+    .rf-node{width:38px;height:38px;font-size:12px}
+    .rf .bed{margin-left:0}
+    .rf .leg{font-size:11px;padding:2px 8px}
+    .rf .stop{font-size:11.5px;padding:2px 8px}
+    .cwrap{height:225px}.cwrap.tall{height:245px}
+    .day-b li{flex-direction:column;gap:1px;padding:6px 0}
+    .day-b li .tm{min-width:0;font-size:13px}
+    .tl-item .t{font-size:13px}.tl-item .c{font-size:13.5px}
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .kpi .v{font-size:20px}
+  }
+  @media(max-width:400px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .stay-list{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>🚗 杭州 ⇄ 威海 · 国庆自驾行程书</h1>
+    <div class="sub">
+      <span class="tag">👥 2 人</span>
+      <span class="tag">⚡ 电车 · 实际续航 500km</span>
+      <span class="tag">📅 9/30 晚 – 10/7 中午</span>
+      <span class="tag">🌊 自然风光主题</span>
+      <span class="tag">🔁 环线不走回头路</span>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="v">~2400<em> km</em></div><div class="l">总里程</div></div>
+      <div class="kpi"><div class="v">1 <em>次</em></div><div class="l">强制充电</div></div>
+      <div class="kpi"><div class="v">¥0</div><div class="l">高速费（国庆免费）</div></div>
+      <div class="kpi"><div class="v">4~4.8<em> 千</em></div><div class="l">总预算 / 2 人（¥4,000–4,800）</div></div>
+      <div class="kpi"><div class="v">11:30</div><div class="l">10/7 到家 · 8 号满血上班</div></div>
+    </div>
+    <svg class="waves" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,64 C240,96 480,28 720,56 C960,84 1200,36 1440,64 L1440,120 L0,120 Z" fill="rgba(255,255,255,.09)"/>
+      <path d="M0,84 C260,56 520,104 780,80 C1040,56 1240,96 1440,78 L1440,120 L0,120 Z" fill="rgba(255,217,168,.12)"/>
+    </svg>
+  </div>
+
+  <!-- 1 路线总览 -->
+  <section>
+    <h2><span class="n">1</span>路线总览：一图看全程</h2>
+    <div class="route-flow">
+      <div class="rf"><div class="rf-node">D0</div><div class="rf-main"><div class="rf-date">9/30 · 周三夜<span class="bed car">🚐 服务区</span></div><div class="rf-body"><span class="stop">杭州 🏠</span><span class="leg">🚗 夜车 260–300km · 3h</span><span class="stop">苏北服务区 🚐睡车里</span></div></div></div>
+      <div class="rf"><div class="rf-node">D1</div><div class="rf-main"><div class="rf-date">10/1 · 周四<span class="bed hotel">🏨 淮安</span></div><div class="rf-body"><span class="stop">淮安</span><span class="leg">文楼汤包 · 河下古镇 · 里运河</span></div></div></div>
+      <div class="rf"><div class="rf-node">D2</div><div class="rf-main"><div class="rf-date">10/2 · 周五<span class="bed hotel">🏨 潮漫✅</span></div><div class="rf-body"><span class="stop">淮安</span><span class="leg">🚗 620km · 7h（唯一充电）</span><span class="stop p0">威海</span><span class="leg">幸福门晚霞 · 韩乐坊</span></div></div></div>
+      <div class="rf"><div class="rf-node">D3</div><div class="rf-main"><div class="rf-date">10/3 · 周六<span class="bed hotel">🏨 潮漫✅</span></div><div class="rf-body"><span class="stop p0">火炬八街</span><span class="arr">→</span><span class="stop p0">小石岛赶海</span><span class="arr">→</span><span class="stop p0">环海路·猫头山</span><span class="arr">→</span><span class="stop p0">合庆码头</span></div></div></div>
+      <div class="rf warn"><div class="rf-node">D4</div><div class="rf-main"><div class="rf-date">10/4 · 周日<span class="bed car">🚐 那香海海边</span></div><div class="rf-body"><span class="stop p0">那香海沙滩</span><span class="arr">→</span><span class="stop">海草房</span><span class="arr">→</span><span class="stop p0">布鲁威斯号日落 ⛔</span></div></div></div>
+      <div class="rf"><div class="rf-node">D5</div><div class="rf-main"><div class="rf-date">10/5 · 周一<span class="bed hotel">🏨 荣成/威海 🟡</span></div><div class="rf-body"><span class="stop p0">成山头「天尽头」</span><span class="arr">→</span><span class="stop">鸡鸣岛 14:00 班</span><span class="leg">→ 海鲜大餐</span></div></div></div>
+      <div class="rf"><div class="rf-node">D6</div><div class="rf-main"><div class="rf-date">10/6 · 周二<span class="bed car">🚐 高邮服务区</span></div><div class="rf-body"><span class="stop p0">万平口</span><span class="arr">→</span><span class="stop">礁石滩日落</span><span class="leg">🚗 夜驾 340km 换开</span><span class="stop">高邮服务区 🚐</span></div></div></div>
+      <div class="rf"><div class="rf-node">D7</div><div class="rf-main"><div class="rf-date">10/7 · 周三<span class="bed home">🏠 到家</span></div><div class="rf-body"><span class="stop">润扬大桥（避开苏通✅）</span><span class="leg">🚗 280km · 3.5h</span><span class="stop">杭州 🏠 11:30</span></div></div></div>
+    </div>
+    <div class="note">💡 图例：红框 = P0 必保景点 ｜ 🏨 酒店 / 🚐 车里 / 🏠 家 —— 车、酒店交替，永不连睡两晚车里</div>
+  </section>
+
+  <!-- 2 数据图表 -->
+  <section>
+    <h2><span class="n">2</span>数据看板</h2>
+    <div class="grid2">
+      <div class="chart-box"><h4>📊 每日驾驶里程（km）— 威海 3 天几乎不开车</h4><div class="cwrap"><canvas id="cDist"></canvas></div></div>
+      <div class="chart-box"><h4>⏱️ 每日纯驾驶时长（小时）— 长途仅 D2 / D6，D6 两人换开</h4><div class="cwrap"><canvas id="cTime"></canvas></div></div>
+      <div class="chart-box"><h4>💰 费用构成（2 人全程，总预算 ≈ ¥4,400）</h4><div class="cwrap tall"><canvas id="cCost"></canvas></div></div>
+      <div class="chart-box"><h4>🔋 每日预计耗电（按 500km 续航折算当日里程，含中途补能）— 全程仅 1 次强制充电</h4><div class="cwrap"><canvas id="cBatt"></canvas></div></div>
+    </div>
+  </section>
+
+  <!-- 3 逐日详情 -->
+  <section>
+    <h2><span class="n">3</span>逐日详细行程</h2>
+
+    <div class="day">
+      <div class="day-h"><span class="num">D0</span><span class="title">9/30 周三 · 夜车出发</span><span class="meta">🚗 <b>260–300km</b> · 3–3.5h</span></div>
+      <div class="day-b"><ul>
+        <li><span class="tm">19:00–22:00</span><span><b>补觉 3 小时</b>（安全底线）+ 确认满电</span></li>
+        <li><span class="tm">22:00</span><span>G25 北上 → 过南京四桥 → <b>洪泽湖/高邮一带大服务区</b>停车睡觉</span></li>
+      </ul>
+      <div class="note">⚠️ 江苏段入口发<b>纸质通行券别丢</b> ｜ 免费只看下高速时间，服务区睡多久都不影响 ｜ 困了就停，别硬撑</div></div>
+    </div>
+
+    <div class="day">
+      <div class="day-h"><span class="num">D1</span><span class="title">10/1 周四 · 淮安休整日</span><span class="meta">🚗 <b>180–220km</b> · 2–2.5h</span></div>
+      <div class="day-b"><ul>
+        <li><span class="tm">自然醒</span><span>剩余路程上午开完，~10:30 到淮安（服务区洗漱）</span></li>
+        <li><span class="tm">11:00</span><span><span class="badge b-eat">吃</span>古文楼（北门大街819号）：蟹黄汤包 · 软兜长鱼 · 文楼涨蛋 · 平桥豆腐</span></li>
+        <li><span class="tm">14:00</span><span><span class="badge b-p2">P2</span>河下古镇（步行可达）+ 岳家茶馓买车上零食</span></li>
+        <li><span class="tm">17:00</span><span><span class="badge b-p2">P2</span>里运河文化长廊夜景 · 宵夜孙家面馆长鱼面</span></li>
+      </ul>
+      <div class="note"><span class="badge b-stay">宿</span>淮安酒店（当天订即可 ~¥250）· 晚上满电</div></div>
+    </div>
+
+    <div class="day">
+      <div class="day-h"><span class="num">D2</span><span class="title">10/2 周五 · 千里奔袭进威海</span><span class="meta">🚗 <b>620km</b> · 7h（含充电 9h）</span></div>
+      <div class="day-b"><ul>
+        <li><span class="tm">8:00</span><span>满电出发，G25 北上（淮安—连云港 8 车道）· ⚠️ 连云港段 3.7km 施工预留 15min</span></li>
+        <li><span class="tm">11:00</span><span>⚡ <b>连云港充电（全程唯一强制）</b>充到 75–80% + 午饭 40min</span></li>
+        <li><span class="tm">17:30</span><span>到威海 → 潮漫酒店（青岛中路128号·免费停车+充电桩）</span></li>
+        <li><span class="tm">18:00</span><span><span class="badge b-p1">P1</span>威海公园/幸福门 · 第一眼黄海晚霞（日落 17:29）</span></li>
+        <li><span class="tm">19:30</span><span><span class="badge b-eat">吃</span>韩乐坊（距酒店 400m）：巧克力渔家 · 赶海归来 · 高五基炒鸡排</span></li>
+      </ul>
+      <div class="note">Buffer 2.5h：延误 1h+ → 砍海边直达酒店</div></div>
+    </div>
+
+    <div class="day sun">
+      <div class="day-h"><span class="num">D3</span><span class="title">10/3 周六 · 威海西线（赶海日）</span><span class="meta">🚗 <b>40–60km</b> 分散</span></div>
+      <div class="day-b"><ul>
+        <li><span class="tm">7:30 前</span><span><span class="badge b-p2">P2</span>火炬八街 —— 价值 = 没人的 20 分钟</span></li>
+        <li><span class="tm">8:00–10:00</span><span><span class="badge b-p0">P0</span>小石岛赶海 ⭐10/3 低潮 ≈ 8:00 前后，窗口不能挪</span></li>
+        <li><span class="tm">10:30</span><span><span class="badge b-p0">P0</span>国际海水浴场 · 清晨踩沙</span></li>
+        <li><span class="tm">12:00</span><span><span class="badge b-eat">吃</span>清泉大酒店（公园路5号）鲅鱼饺子 · 车里午休 40min</span></li>
+        <li><span class="tm">14:30</span><span><span class="badge b-p0">P0</span>环海路自驾：半月湾 → <b>猫头山 3 号观景台</b>（3h，全天主菜）</span></li>
+        <li><span class="tm">15:00–17:30</span><span><span class="badge b-p0">P0</span>合庆码头 · 渔船回港买梭子蟹/虾爬子找加工 → 海边日落 17:29</span></li>
+      </ul>
+      <div class="note">D2 晚必须核对 10/3 精确潮汐，低潮偏晚则赶海/浴场顺序对调 ｜ 砍序：海源公园 → 火炬八街</div></div>
+    </div>
+
+    <div class="day sun">
+      <div class="day-h"><span class="num">D4</span><span class="title">10/4 周日 · 东线 · 布鲁威斯号日落 ⛔</span><span class="meta">🚗 <b>90–120km</b> · 2–2.5h</span></div>
+      <div class="day-b"><ul>
+        <li><span class="tm">8:30</span><span>环海路向东（路本身就是 P0）</span></li>
+        <li><span class="tm">10:00</span><span><span class="badge b-p1">P1</span>那香海钻石沙滩（免费）躺平拍照</span></li>
+        <li><span class="tm">12:30</span><span><span class="badge b-eat">吃</span>香海渔港：海肠捞饭 · 一锅鲜 · 鱼锅饼子（人均~73）</span></li>
+        <li><span class="tm">14:30</span><span><span class="badge b-p0">P0</span>海草房：东楮岛（原生态）/ 金石湾（顺路）二选一</span></li>
+        <li><span class="tm"><b>16:00</b></span><span><span class="badge b-p0">P0</span><b>布鲁威斯号搁浅船 · 日落 17:28</b> ⛔ 全程唯一不许砍，提前 1.5h 占位</span></li>
+        <li><span class="tm">19:00</span><span><span class="badge b-eat">吃</span>渔家乐：干锅海葵 · 凉拌鸟贝 · 清蒸大鱿鱼 · 葱烧海参</span></li>
+      </ul>
+      <div class="note"><span class="badge b-stay">宿</span>🚐 那香海第一停车场（环海路6699号·房车聚集地）：厚被·车头背风·留窗缝 ｜ 📞 今晚打 <b>0631-7866728</b> 确认明日鸡鸣岛船期</div></div>
+    </div>
+
+    <div class="day sun">
+      <div class="day-h"><span class="num">D5</span><span class="title">10/5 周一 · 成山头 + 鸡鸣岛</span><span class="meta">🚗 <b>100–150km</b> · 2–2.5h</span></div>
+      <div class="day-b"><ul>
+        <li><span class="tm">5:30</span><span><span class="badge b-p2">P2</span>被窝看海上日出（日出 <b>5:49</b>，想看得这个点起）</span></li>
+        <li><span class="tm">9:30</span><span><span class="badge b-p0">P0</span>成山头「天尽头」门票148+车80（<b>可自驾入园</b>）· 2.5–3h</span></li>
+        <li><span class="tm">14:00</span><span><span class="badge b-p1">P1</span>鸡鸣岛：虎头角码头（回程顺路）· 船票128 · 赶 14:00 班（另有 8:40/10:00/11:00/13:00/16:30）· 岛上 2–3h</span></li>
+        <li><span class="tm">19:30</span><span><span class="badge b-p0">P0</span>告别海鲜大餐（梭子蟹·生蚝·扇贝正肥）</span></li>
+      </ul>
+      <div class="note">🎫 鸡鸣岛船票<b>提前 1–3 天线上买</b>（每天仅 6 班船，有售罄风险）｜ 停航或排队超 40 分钟 → 直接砍，成山头多待</div></div>
+    </div>
+
+    <div class="day">
+      <div class="day-h"><span class="num">D6</span><span class="title">10/6 周二 · 日照 → 夜驾 → 高邮</span><span class="meta">🚗 <b>740km</b> · 8h 换开</span></div>
+      <div class="day-b"><ul>
+        <li><span class="tm">8:30</span><span>满电出发（荣乌→绕城→沈海 G15）· 396km 直达</span></li>
+        <li><span class="tm">13:00</span><span><span class="badge b-eat">吃</span>到日照 · 万平口/石臼所一带午饭（涛雒折返40km，放弃）</span></li>
+        <li><span class="tm">14:00</span><span><span class="badge b-p0">P0</span>万平口海滨风景区（今天主菜）</span></li>
+        <li><span class="tm">16:30</span><span><span class="badge b-p0">P0</span>任家台/李家台礁石滩散步看夕阳（深低潮在日落后，看滩不挖货）</span></li>
+        <li><span class="tm">17:29</span><span><span class="badge b-p1">P1</span>灯塔广场日落 · 石臼所市场海鲜晚饭</span></li>
+        <li><span class="tm">19:15</span><span>🚗 夜驾：G15→灌云北转长深→王兴枢纽转 G2 京沪南下（340km/4h 两人换开）</span></li>
+        <li><span class="tm">23:15</span><span>高邮服务区睡车里（千车位+百枪充电+司机之家）· 备选宝应服务区</span></li>
+      </ul>
+      <div class="note">纪律：困了立刻换人 · <b>23:30 前必须停</b> ｜ 想多留日照 → 20:00 出发也来得及</div></div>
+    </div>
+
+    <div class="day">
+      <div class="day-h"><span class="num">D7</span><span class="title">10/7 周三 · 轻松收官</span><span class="meta">🚗 <b>280km</b> · 3–3.5h</span></div>
+      <div class="day-b"><ul>
+        <li><span class="tm">自然醒</span><span>服务区洗漱+早餐（昨夜插枪充电，无需再充）</span></li>
+        <li><span class="tm">8:00</span><span>出发 → <b>9:30 过润扬大桥</b>（限流 14:00–22:00，上午随便过 ✅ 避开苏通大桥）</span></li>
+        <li><span class="tm">~11:30</span><span>到家 🏠 —— 10/8 满血上班</span></li>
+      </ul>
+      <div class="note">想吃可镇江下高速：锅盖面 + 水晶肴肉</div></div>
+    </div>
+  </section>
+
+  <!-- 4 优先级 -->
+  <section>
+    <h2><span class="n">4</span>景点优先级（累了怎么砍，看这张表）</h2>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th style="width:70px">日期</th><th><span class="dot r"></span>P0 · 灵魂必保</th><th><span class="dot y"></span>P1 · 值得，可砍</th><th><span class="dot g"></span>P2 · 随缘</th></tr>
+      <tr><td>D1 淮安</td><td class="p0">补觉</td><td class="p1">—</td><td class="p2">文楼 · 河下古镇 · 里运河</td></tr>
+      <tr><td>D2 赶路</td><td class="p0">安全到威海</td><td class="p1">海边晚霞</td><td class="p2">韩乐坊夜市</td></tr>
+      <tr><td>D3 西线</td><td class="p0">环海路猫头山 · 小石岛赶海 · 合庆码头</td><td class="p1">海源公园日落</td><td class="p2">火炬八街</td></tr>
+      <tr><td>D4 东线</td><td class="p0">布鲁威斯号日落 ⛔（16:00 占位）· 海草房</td><td class="p1">那香海沙滩</td><td class="p2">—</td></tr>
+      <tr><td>D5 荣成</td><td class="p0">成山头 · 告别海鲜大餐</td><td class="p1">鸡鸣岛</td><td class="p2">被窝日出（5:30 起）</td></tr>
+      <tr><td>D6 日照</td><td class="p0">万平口 · 礁石滩 · 夜宿高邮</td><td class="p1">灯塔日落</td><td class="p2">—</td></tr>
+      <tr><td>D7 返程</td><td class="p0">8:00 前出发</td><td class="p1">—</td><td class="p2">镇江锅盖面</td></tr>
+    </table>
+    <div class="note">✂️ 砍序规则：先砍 P2 → 再砍 P1 → 开车日延误超 1.5h 则当天只保 P0（吃永远算 P0）</div>
+    </div>
+  </section>
+
+  <!-- 5 住宿 -->
+  <section>
+    <h2><span class="n">5</span>住宿安排（3 晚酒店 + 3 晚车里，交替不连睡）</h2>
+    <div class="stay-list">
+      <div class="stay"><span class="st ok">✅ 免订</span><div class="n">9/30 · 苏北服务区 🚐</div><div class="info">洪泽湖/高邮一带大服务区 · 免费 · 带耳塞</div></div>
+      <div class="stay"><span class="st todo">🟡 当天订</span><div class="n">10/1 · 淮安酒店 🏨</div><div class="info">~¥250 · G25 淮安口附近连锁</div></div>
+      <div class="stay"><span class="st ok">✅ 已订</span><div class="n">10/2–3 · 潮漫酒店 🏨</div><div class="info">青岛中路128号 · 免费停车+充电桩 · 距韩乐坊400m · 锦江中端 2026 新店</div></div>
+      <div class="stay"><span class="st ok">✅ 免订</span><div class="n">10/4 · 那香海停车场 🚐</div><div class="info">环海路6699号 · 房车聚集地 · 厚被+背风+留缝</div></div>
+      <div class="stay"><span class="st todo">🟡 待订</span><div class="n">10/5 · 荣成或潮漫 🏨</div><div class="info">两边动线都顺 · 荣成县城便宜（~¥250）</div></div>
+      <div class="stay"><span class="st ok">✅ 免订</span><div class="n">10/6 · 高邮服务区 🚐</div><div class="info">千车位+百枪充电+司机之家 · 先插枪再铺床</div></div>
+    </div>
+  </section>
+
+  <!-- 6 关键时刻表 -->
+  <section>
+    <h2><span class="n">6</span>全天候关键时刻表</h2>
+    <div class="tl">
+      <div class="tl-item warn"><div class="t">⚠️ D0 · 22:00</div><div class="c">准时出发（前置补觉 3h）—— <b>胜负手</b></div></div>
+      <div class="tl-item"><div class="t">D3 · 7:30 → 8:00</div><div class="c">火炬八街没人时段 → 小石岛<b>低潮窗口 ≈8:00–10:00</b></div></div>
+      <div class="tl-item warn"><div class="t">⛔ D4 · 16:00</div><div class="c">到布鲁威斯号占机位，<b>日落 17:28</b> —— 全程唯一不许砍</div></div>
+      <div class="tl-item"><div class="t">D5 · 5:49</div><div class="c">那香海海上日出（5:30 起）/ 14:00 鸡鸣岛班船</div></div>
+      <div class="tl-item"><div class="t">D6 · 17:29</div><div class="c">日照灯塔广场日落 · 19:15 夜驾出发</div></div>
+      <div class="tl-item warn"><div class="t">⚠️ D6 · 23:30</div><div class="c">前必须停进高邮服务区</div></div>
+      <div class="tl-item"><div class="t">D7 · 8:00 → 11:30</div><div class="c">出发 → 过润扬大桥（避开苏通）→ 到家</div></div>
+    </div>
+  </section>
+
+  <!-- 7 门票 -->
+  <section>
+    <h2><span class="n">7</span>门票清单（全程收费景点仅 2 个）</h2>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th>项目</th><th>价格</th><th>是否提前买</th><th>说明</th></tr>
+      <tr><td><b>鸡鸣岛往返船票</b> ⭐</td><td>128/人（平台108起）</td><td class="p0">必须提前 1–3 天</td><td>每天仅 6 班船，有售罄风险；停航退票</td></tr>
+      <tr><td>成山头门票</td><td>148/人</td><td class="p1">建议线上买</td><td>扫码进园省排队 20–30min</td></tr>
+      <tr><td>成山头车辆入园费</td><td>80/车</td><td class="p2">现场买</td><td>可自驾进景区，省腿</td></tr>
+      <tr><td>环海路 · 那香海 · 火炬八街 · 合庆码头 · 万平口 · 灯塔广场</td><td><b>全免费</b></td><td>—</td><td>本行程主菜大多不要钱 🎉</td></tr>
+    </table>
+    </div>
+  </section>
+
+  <!-- 8 预算 -->
+  <section>
+    <h2><span class="n">8</span>预算与装备</h2>
+    <div class="grid2">
+      <div>
+        <h3>💰 预算（2 人）</h3>
+        <div class="tbl-wrap">
+        <table>
+          <tr><th>项目</th><th>金额</th></tr>
+          <tr><td>电费（~2400km）</td><td>~¥400</td></tr>
+          <tr><td>高速费</td><td><b>¥0（国庆免费）</b></td></tr>
+          <tr><td>住宿（3晚酒店+3晚车里）</td><td>~¥1,000–1,300</td></tr>
+          <tr><td>餐饮 7 天</td><td>~¥2,000–2,500</td></tr>
+          <tr><td>门票（148+80+128×2）</td><td>~¥600</td></tr>
+          <tr><td><b>合计</b></td><td><b>~¥4,000–4,800</b></td></tr>
+        </table>
+        </div>
+      </div>
+      <div>
+        <h3>🎒 装备清单</h3>
+        <ul class="check">
+          <li>厚被子/睡袋（夜 12–15℃）+ <b>耳塞</b> + 车窗防雨挡</li>
+          <li>防风外套×2 · 薄羽绒/卫衣（日落降温快）</li>
+          <li>赶海铲+桶+手套 · 手电</li>
+          <li>充电 App 收藏：连云港 · 高邮服务区</li>
+          <li>潮汐小程序：小石岛(10/3) · 任家台(10/6)</li>
+          <li>洗漱包放随手位置（服务区晨洗）</li>
+          <li>9/30 江苏段纸质通行券（下高速交）</li>
+        </ul>
+        <h3 style="margin-top:14px">📞 出发前待办</h3>
+        <ul class="check">
+          <li>🔴 买鸡鸣岛 10/5 船票（提前 1–3 天）</li>
+          <li>🟡 订 10/5 晚住宿（荣成/潮漫）</li>
+          <li>🟡 D2 晚查 10/3 小石岛精确潮汐</li>
+          <li>🟡 D4 晚打 0631-7866728 确认鸡鸣岛船期</li>
+          <li>🟢 成山头门票线上买 · 淮安房当天订</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 预案 -->
+  <section>
+    <h2><span class="n">9</span>紧急调整预案（怎么都不至于崩）</h2>
+    <div class="tbl-wrap">
+    <table>
+      <tr><th style="width:40%">如果……</th><th>对策</th></tr>
+      <tr><td>鸡鸣岛停航 / 排队超 40 分钟</td><td>直接砍，成山头多待 + 回程海边咖啡馆</td></tr>
+      <tr><td>D2 延误超 1 小时</td><td>砍海边晚霞，直达酒店吃饭休息</td></tr>
+      <tr><td>10/6 想多留日照</td><td>夜段推迟到 20:00 出发，仍 23:30 前停</td></tr>
+      <tr><td>10/5 荣成/威海都没房</td><td>睡车里（最后手段，会连睡两晚车里）</td></tr>
+      <tr><td>任何一天特别累</td><td>砍掉当天全部 P1/P2，P0 里只保「吃」</td></tr>
+      <tr><td>9/30 实在走不了</td><td>改 10/1 清晨出发（错过早高峰前过溧阳），其余不变</td></tr>
+    </table>
+    </div>
+  </section>
+
+  <footer>行程书 v3.0 · 三轮子 agent 交叉验证（距离续航 / 过江通道 / 时刻潮汐）· 数据核验于 2026-09 · 祝旅途顺利 🌊</footer>
+</div>
+
+<script>
+/* ===== 图表统一设计语言 ===== */
+const C={deep:'#0c3a44',sea:'#17798b',seaSoft:'#8fc3cc',coral:'#e9734f',coralDeep:'#c74e2b',gold:'#e6a23c',sand:'#ddd3bf',sub:'#68797f',grid:'#ece5d6'};
+Chart.defaults.font.family='-apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+Chart.defaults.font.size=12;
+Chart.defaults.color=C.sub;
+Object.assign(Chart.defaults.plugins.tooltip,{
+  backgroundColor:'rgba(12,58,68,.95)',titleColor:'#ffd9a8',bodyColor:'#ffffff',
+  padding:11,cornerRadius:10,boxPadding:5,usePointStyle:true,
+  titleFont:{size:12,weight:'700'},bodyFont:{size:12}
+});
+Object.assign(Chart.defaults.plugins.legend.labels,{usePointStyle:true,pointStyle:'circle',boxWidth:7,boxHeight:7,padding:14,font:{size:11.5}});
+
+const AXES={grid:{color:C.grid},border:{display:false}};
+const AXES_X={grid:{display:false},border:{display:false}};
+
+/* 1. 每日里程 · 圆角柱 */
+new Chart(document.getElementById('cDist'),{type:'bar',data:{
+  labels:['D0 夜车','D1 淮安','D2 进威','D3 西线','D4 东线','D5 荣成','D6 日照+夜驾','D7 返程'],
+  datasets:[{label:'当日里程 (km)',data:[280,200,620,50,105,125,740,280],
+    backgroundColor:c=>{const i=c.index;return i===6?C.coral:i===2?C.gold:(i>=3&&i<=5)?C.seaSoft:C.sea},
+    borderRadius:{topLeft:7,topRight:7},maxBarThickness:30}]},
+  options:{maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.parsed.y+' km'}}},
+    scales:{y:{...AXES,title:{display:true,text:'km',color:C.sub,font:{size:11}}},x:AXES_X}}});
+
+/* 2. 每日驾驶时长 · 圆角柱（珊瑚=长途日 D2/D6） */
+new Chart(document.getElementById('cTime'),{type:'bar',data:{
+  labels:['D0','D1','D2','D3','D4','D5','D6','D7'],
+  datasets:[{label:'纯驾驶时长 (h)',data:[3.2,2.3,7,1,2.3,2.3,8,3.3],
+    backgroundColor:c=>(c.index===2||c.index===6)?C.coral:C.sea,
+    borderRadius:{topLeft:7,topRight:7},maxBarThickness:30}]},
+  options:{maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.parsed.y+' 小时'}}},
+    scales:{y:{...AXES,title:{display:true,text:'小时',color:C.sub,font:{size:11}}},x:AXES_X}}});
+
+/* 3. 费用构成 · 环形图 + 中心总额 */
+const costCenter={id:'costCenter',afterDraw(chart){
+  const {ctx,chartArea}=chart;if(!chartArea)return;
+  const cx=(chartArea.left+chartArea.right)/2,cy=(chartArea.top+chartArea.bottom)/2;
+  ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillStyle=C.deep;ctx.font='700 21px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+  ctx.fillText('≈ ¥4,400',cx,cy-9);
+  ctx.fillStyle=C.sub;ctx.font='11.5px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+  ctx.fillText('总预算 / 2 人',cx,cy+13);ctx.restore();}};
+new Chart(document.getElementById('cCost'),{type:'doughnut',data:{
+  labels:['餐饮 ~¥2,200','住宿 ~¥1,150','门票 ~¥600','电费 ~¥400','高速费 ¥0'],
+  datasets:[{data:[2200,1150,600,400,1],
+    backgroundColor:[C.coral,C.sea,C.gold,C.seaSoft,C.sand],
+    hoverOffset:6,borderWidth:2,borderColor:'#fffdf9'}]},
+  options:{maintainAspectRatio:false,cutout:'62%',
+    plugins:{legend:{position:'bottom'},
+      tooltip:{callbacks:{label:c=>' '+c.label}}}},
+  plugins:[costCenter]});
+
+/* 4. 每日耗电 · 按续航 500km 折算（D2/D6 含中途补能，为满电+充电后的总消耗） */
+new Chart(document.getElementById('cBatt'),{type:'line',data:{
+  labels:['D0','D1','D2','D3','D4','D5','D6','D7'],
+  datasets:[
+    {label:'当日总耗电（满电+补能后）%',data:[56,40,124,10,21,25,148,56],
+     borderColor:C.coral,backgroundColor:'rgba(233,115,79,.10)',fill:true,tension:.3,borderWidth:2.5,
+     pointRadius:4,pointHoverRadius:6,pointBackgroundColor:'#fffdf9',pointBorderColor:C.coral,pointBorderWidth:2.5,
+     segment:{borderDash:c=>c.p1.parsed.y>100?[6,4]:undefined}},
+    {label:'单块电池容量线（100%）',data:[100,100,100,100,100,100,100,100],
+     borderColor:C.sea,borderDash:[6,4],borderWidth:1.5,pointRadius:0,pointHoverRadius:0,fill:false,tension:0}]},
+  options:{maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>' '+c.dataset.label+'：'+c.parsed.y+'%'}}},
+    scales:{y:{...AXES,min:0,max:160,ticks:{callback:v=>v+'%'}},x:AXES_X}}});
+</script>
+</body>
+</html>
